@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  name       String?
+  createdAt  DateTime  @default(now())
+  modifiedAt DateTime  @default(now())
+  password   String
+  phone      String?
+  username   String    @unique
+  addresses  Address[]
+  order      Order?    @relation(fields: [orderId], references: [id])
+  orderId    Int?   @unique
+}
+
+model Address {
+  id         Int      @id @default(autoincrement())
+  userId     Int?
+  cep        String
+  city       String
+  street     String
+  number     Int?
+  district   String
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @default(now())
+  user       User?    @relation(fields: [userId], references: [id])
+}
+model Drinks{
+  id         Int      @id @default(autoincrement())
+  price      Int?
+  description String
+  name        String
+  createdAt  DateTime @default(now())
+  modifiedAt DateTime @default(now())
+}
+model Additionals {
+  id          Int      @id @default(autoincrement())
+  name        String
+  price       Int
+  description String?
+  createdAt   DateTime @default(now())
+  modifiedAt  DateTime @updatedAt
+  orderId     Int?
+  order       Order?   @relation(fields: [orderId], references: [id])
+}
+model Hamburger {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Int
+  createdAt   DateTime @default(now())
+  modifiedAt  DateTime @updatedAt
+  orderId     Int?
+  order       Order?   @relation(fields: [orderId], references: [id])
+}
+
+model Order {
+  id         Int           @id @default(autoincrement())
+  costomer   String
+  total      Int
+  createdAt  DateTime      @default(now())
+  modifiedAt DateTime      @updatedAt
+  additional Additionals[]
+  hamburger  Hamburger[]
+  user       User?
+}
